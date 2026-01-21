@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Leaderboard Money • XiaZira Floryn</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #1b1f3b, #090a1a);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      animation: fadeDown 1s ease;
+    }
+
+    .header h1 {
+      font-size: 2.4rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #7dd3fc, #a78bfa, #f472b6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .header p {
+      opacity: 0.8;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.4);
+      animation: fadeUp 1.2s ease;
+    }
+
+    .leaderboard {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 60px 1fr 160px;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 14px 18px;
+      border-radius: 14px;
+      transition: all 0.35s ease;
+      position: relative;
+      overflow: hidden;
+      animation: slideIn 0.6s ease forwards;
+      opacity: 0;
+    }
+
+    .row::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.15), transparent);
+      transform: translateX(-100%);
+    }
+
+    .row:hover::before {
+      transform: translateX(100%);
+      transition: transform 0.8s ease;
+    }
+
+    .row:hover {
+      transform: scale(1.015);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .rank {
+      font-size: 1.3rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .rank.gold { color: #facc15; }
+    .rank.silver { color: #cbd5e1; }
+    .rank.bronze { color: #f59e0b; }
+
+    .user {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+
+    .username {
+      font-weight: 600;
+    }
+
+    .money {
+      text-align: right;
+      font-weight: 700;
+      color: #4ade80;
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 0.8rem;
+      opacity: 0.6;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-25px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(-20px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💰 Leaderboard Money</h1>
+      <p>Top kekayaan pengguna • Kayoko Multiverse</p>
+    </div>
+
+    <div class="card">
+      <div class="leaderboard" id="leaderboard"></div>
+    </div>
+
+    <div class="footer">
+      © XiaZira Floryn Community 2025–2026 • All Rights Reserved
+    </div>
+  </div>
+
+  <script>
+    // ===== API BOT WHATSAPP CONFIG =====
+    // Ganti URL ini dengan endpoint bot WhatsApp kamu
+    const API_URL = "https://your-bot-domain.com/api/leaderboard";
+
+    async function loadLeaderboard() {
+      try {
+        const res = await fetch(API_URL);
+        const json = await res.json();
+
+        // contoh response API:
+        // { data: [{ name: "alyadziru", money: 1500000, avatar: "" }] }
+        const dataMoney = json.data || [];
+
+        dataMoney.sort((a, b) => b.money - a.money);
+
+        const board = document.querySelector('.leaderboard');
+        board.innerHTML = '';
+
+        dataMoney.forEach((user, i) => {
+          const rankClass = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+          const avatarText = user.name?.charAt(0).toUpperCase() || '?';
+
+          const row = document.createElement('div');
+          row.className = 'row';
+          row.style.animationDelay = `${i * 0.1}s`;
+
+          row.innerHTML = `
+            <div class="rank ${rankClass}">#${i + 1}</div>
+            <div class="user">
+              <div class="avatar">${avatarText}</div>
+              <div class="username">${user.name}</div>
+            </div>
+            <div class="money">Rp ${Number(user.money).toLocaleString('id-ID')}</div>
+          `;
+
+          board.appendChild(row);
+        });
+      } catch (err) {
+        console.error('Gagal memuat leaderboard:', err);
+      }
+    }
+
+    loadLeaderboard();
+
+    const dataMoney = [
+      { name: "alyadziru", money: 1500000000 },
+      { name: "Nexiro", money: 720000000 },
+      { name: "Mmeber", money: 0 },
+      { name: "Member", money: 0 },
+      { name: "Member", money: 0 }
+    ];
+
+    dataMoney.sort((a, b) => b.money - a.money);
+
+    const leaderboard = document.getElementById('leaderboard');
+
+    dataMoney.forEach((user, index) => {
+      const row = document.createElement('div');
+      row.className = 'row';
+      row.style.animationDelay = `${index * 0.15}s`;
+
+      const rankClass = index === 0 ? 'gold' : index === 1 ? 'silver' : index === 2 ? 'bronze' : '';
+
+      row.innerHTML = `
+        <div class="rank ${rankClass}">#${index + 1}</div>
+        <div class="user">
+          <div class="avatar">${user.name.charAt(0).toUpperCase()}</div>
+          <div class="username">${user.name}</div>
+        </div>
+        <div class="money">Rp ${user.money.toLocaleString('id-ID')}</div>
+      `;
+
+      leaderboard.appendChild(row);
+    });
+
+    lucide.createIcons();
+  </script>
+</body>
+</html>
